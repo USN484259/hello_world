@@ -21,7 +21,7 @@ void __declspec(naked) ShellCode()
 
 		push ebp;
 		mov ebp, esp;
-		mov eax,DWORD PTR [ebp + 0Ch];
+		mov eax,DWORD PTR [ebp + 0Ch];	arg1 ?
 		mov DWORD PTR [ebp + 8], eax;
 		mov eax, DWORD PTR [ebp+4];
 		sub eax, SIZE_JMPCODE;
@@ -47,7 +47,7 @@ void __declspec(naked) ShellCode()
 		int 3;
 		int 3;
 		int 3;
-		int 3;
+		int 3;		//to indicate the end of shellcode
 
 	};
 }
@@ -129,16 +129,16 @@ VOID CodeCopy(PVOID P) {
 		UINT Index = 0;
 #pragma warning(disable:4054)
 		for (PBYTE f = (PBYTE)((PVOID)ShellCode), t = (PBYTE)P; Index < SHELLCODE_SIZE; f++, t++, Index++) {
-			if (Index == SIZE_JMPCODE) {
+			if (Index == SIZE_JMPCODE) {	//overwrite first 7 bytes ?
 				*(PULONG)t = (ULONG)((PVOID)DriverUnload);
-				Index += 3;
+				Index += 3;	//why 3 ?
 				f += 3;
 				t += 3;
 				continue;
 			}
-			if ((*t = *f) == 0xcc) {
+			if ((*t = *f) == 0xcc) {	//int3  instruction
 				if (++_CcCount >= 0x10)
-					break;
+					break;		//leave when 16 int3 appears
 			}
 			else
 				_CcCount = 0;
